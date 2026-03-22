@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 92%;
+    --card: 220 40% 6%;
+    --card-foreground: 210 40% 92%;
+    --popover: 222 40% 7%;
+    --popover-foreground: 210 40% 92%;
+    --primary: 195 100% 50%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 265 60% 55%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 30% 11%;
+    --muted-foreground: 215 20% 52%;
+    --accent: 222 30% 11%;
+    --accent-foreground: 195 100% 60%;
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 30% 13%;
+    --input: 222 30% 9%;
+    --ring: 195 100% 50%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    background-color: #060910;
+    background-image:
+      radial-gradient(ellipse at 15% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(168, 85, 247, 0.05) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 95%, rgba(0, 100, 255, 0.04) 0%, transparent 55%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: rgba(6, 9, 16, 0.8); }
+  ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.5); }
+}

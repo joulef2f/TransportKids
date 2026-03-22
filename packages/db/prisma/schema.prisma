@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  DRIVER
+}
+
+model Company {
+  id           String    @id @default(cuid())
+  name         String
+  siret        String?
+  costSettings Json
+  users        User[]
+  vehicles     Vehicle[]
+  drivers      Driver[]
+  clients      Client[]
+  tours        Tour[]
+}
+
+model Vehicle {
+  id              String        @id @default(cuid())
+  companyId       String
+  company         Company       @relation(fields: [companyId], references: [id])
+  plate           String
+  brand           String
+  model           String
+  capacity        Int
+  fuelType        FuelType
+  consumptionL100 Float
+  kmTotal         Int           @default(0)
+  nextServiceKm   Int?
+  insuranceExpiry DateTime?
+  controlExpiry   DateTime?
+  status          VehicleStatus @default(AVAILABLE)
+  tours           Tour[]
+}
+
+enum FuelType {
+  DIESEL
+  PETROL
+  ELECTRIC
+  HYBRID
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  MAINTENANCE
+  UNAVAILABLE
+}
+
+model Driver {
+  id            String       @id @default(cuid())
+  companyId     String
+  company       Company      @relation(fields: [companyId], references: [id])
+  firstName     String
+  lastName      String
+  phone         String
+  licenseNum    String
+  licenseExpiry DateTime?
+  hourlyRate    Float
+  status        DriverStatus @default(ACTIVE)
+  tours         Tour[]
+}
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Client {
+  id           String     @id @default(cuid())
+  companyId    String
+  company      Company    @relation(fields: [companyId], references: [id])
+  name         String
+  type         ClientType
+  address      String
+  contactEmail String?
+  contactPhone String?
+  children     Child[]
+  invoices     Invoice[]
+}
+
+enum ClientType {
+  SCHOOL
+  MDPH
+  CPAM
+  ARS
+  PRIVATE
+  OTHER
+}
+
+model Child {
+  id            String     @id @default(cuid())
+  clientId      String
+  client        Client     @relation(fields: [clientId], references: [id])
+  firstName     String
+  lastName      String
+  pickupAddress String
+  schoolAddress String
+  notes         String?
+  tourStops     TourStop[]
+}
+
+model Tour {
+  id          String     @id @default(cuid())
+  companyId   String
+  company     Company    @relation(fields: [companyId], references: [id])
+  name        String
+  date        DateTime
+  driverId    String
+  driver      Driver     @relation(fields: [driverId], references: [id])
+  vehicleId   String
+  vehicle     Vehicle    @relation(fields: [vehicleId], references: [id])
+  type        TourType
+  status      TourStatus @default(PLANNED)
+  billedPrice    Float?
+  distanceKm     Float?
+  durationMin    Int?
+  recurrence     Json?
+  startAddress   String?
+  endAddress     String?
+  stops       TourStop[]
+  cost        TourCost?
+  createdAt   DateTime   @default(now())
+}
+
+enum TourType {
+  ONE_WAY
+  ROUND_TRIP
+  MULTI
+}
+
+enum TourStatus {
+  PLANNED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model TourStop {
+  id            String    @id @default(cuid())
+  tourId        String
+  tour          Tour      @relation(fields: [tourId], references: [id])
+  childId       String
+  child         Child     @relation(fields: [childId], references: [id])
+  address       String
+  lat           Float?
+  lng           Float?
+  sequenceOrder Int
+  scheduledTime DateTime?
+  actualTime    DateTime?
+}
+
+model TourCost {
+  id              String @id @default(cuid())
+  tourId          String @unique
+  tour            Tour   @relation(fields: [tourId], references: [id])
+  fuelCost        Float
+  salaryCost      Float
+  maintenanceCost Float
+  tollCost        Float  @default(0)
+  fixedCostShare  Float
+  totalCost       Float
+  margin          Float?
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  month       Int
+  year        Int
+  totalAmount Float
+  status      InvoiceStatus @default(PENDING)
+  generatedAt DateTime      @default(now())
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
