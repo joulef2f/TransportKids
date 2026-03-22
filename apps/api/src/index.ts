@@ -13,10 +13,14 @@ import companyRouter from './routes/company'
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL,
+].filter(Boolean)
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (curl, mobile apps) or any localhost port in dev
     if (!origin || origin.startsWith('http://localhost:')) return callback(null, true)
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true)
     callback(null, false)
   },
   credentials: true,
